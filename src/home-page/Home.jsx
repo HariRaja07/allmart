@@ -1,7 +1,11 @@
 import React from "react";
+import { useNavigate } from 'react-router-dom'; // Updated import
+
 import CarouselBanner from "./CarouselBanner";
 import logo from "../assets/allMartLogo.png";
 import advertise from "../assets/discount.png";
+
+
 import fruitsImage from "../assets/fruits.jpg"; // Placeholder image for fruits
 import vegetablesImage from "../assets/vegetables.jpg"; // Placeholder image for vegetables
 import masalaImage from "../assets/masala.jpg"; // Placeholder image for packaged foods
@@ -50,6 +54,13 @@ const categories = [
 ];
 
 const Home = () => {
+
+  const navigate = useNavigate(); // Use useNavigate
+
+  const handleCategoryClick = (name) => {
+    navigate(`/category/${name}`); // Use navigate instead of history.push
+  };
+
   return (
     <div className="flex flex-row justify-center items-start">
       {/* Left Advertisement */}
@@ -73,13 +84,13 @@ const Home = () => {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 p-4">
-          {categories.map((category) => (
-            <div key={category.name} className="card">
-              <img src={category.image} alt={category.name} className="category-image" />
-              <h2 className="category-name">{category.name}</h2>
-            </div>
-          ))}
-        </div>
+        {categories.map((category) => (
+          <div key={category.name} className="card" onClick={() => handleCategoryClick(category.name)}>
+            <img src={category.image} alt={category.name} className="category-image" />
+            <h2 className="category-name">{category.name}</h2>
+          </div>
+        ))}
+      </div>
       </div>
 
       {/* Right Advertisement */}

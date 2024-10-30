@@ -1,13 +1,16 @@
 // src/Header.js
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { FaChevronDown } from "react-icons/fa";
 import { IoSearchOutline } from "react-icons/io5";
 import { IoCartOutline } from "react-icons/io5";
 import { LuUserCircle2 } from "react-icons/lu";
-import CarouselBanner from "../home-page/CarouselBanner";
 import logo from "../assets/allMartLogo.png";
 
-const Header = () => {
+const Header = ({cartItems}) => {
+  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const navigate = useNavigate(); // Initialize useNavigate
+
   const [location, setLocation] = useState({ lat: null, lng: null });
   const [address, setAddress] = useState("");
   const [error, setError] = useState(null);
@@ -123,7 +126,8 @@ const Header = () => {
       </div>
       <div className="flex flex-col items-center ml-2">
         <IoCartOutline className="mr-1 w-8 h-8" />
-        <button className="text-gray-700 hover:text-blue-500 text-sm font-[Roboto] font-semibold">
+        <span className="text-red-500">{totalItems}</span> {/* Cart count */}
+        <button className="text-gray-700 hover:text-blue-500 text-sm font-[Roboto] font-semibold" onClick={() => navigate('/cart')}>
           Cart
         </button>
       </div>
