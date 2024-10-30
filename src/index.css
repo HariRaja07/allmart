@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.container {
+    padding: 20px;
+  }
+  
+  .card {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    text-align: center;
+    transition: transform 0.2s;
+  }
+  
+  .card:hover {
+    transform: scale(1.05);
+  }
+  
+  .category-image {
+    width: 100%;
+    height: 150px; /* Fixed height */
+    object-fit: cover; /* Ensures the image covers the area */
+  }
+  
+  .category-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 10px 0;
+  }
+  
+  .left-ad, .right-ad {
+    width: 200px; /* Adjust this width as necessary */
+    padding: 10px;
+     /* Placeholder background color */
+    text-align: center;
+  }
+  
+  .banner-image {
+    max-width: 100%; /* Ensure the image fits the container */
+    height: auto; /* Maintain aspect ratio */
+  }
+  
+  .content {
+    flex: 1; /* This allows the content to fill the remaining space */
+    margin: 0 10px; /* Optional margin for spacing */
+  }
+  
+  /* Optional styles for responsiveness */
+  @media (max-width: 768px) {
+    .flex {
+      flex-direction: column; /* Stack advertisements and content on smaller screens */
+    }
+  }
