@@ -55,3 +55,7 @@
       flex-direction: column; /* Stack advertisements and content on smaller screens */
     }
   }
+
+  .header-text {
+    font-family: 'Roboto', sans-serif;
+  }

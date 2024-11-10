@@ -26,14 +26,14 @@ const CarouselBanner = () => {
   ];
 
   return (
-    <div className="mb-12 w-full mx-auto rounded-xl">
-      <Carousel autoplay className='rounded-xl'>
+    <div className="w-full mx-auto">
+      <Carousel autoplay className=''>
         {banners.map((img) => (
           <div key={img.id}>
             <img
               src={img.image}
               alt={img.alt}
-              className="w-full h-64 object-cover rounded-xl mt-5"
+              className="w-full h-96 object-cover mt-5"
             />
           </div>
         ))}

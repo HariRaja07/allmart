@@ -1,40 +1,20 @@
-// src/CategoryPage.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-
-import appleImage from "./assets/apple.jpg"
-import bananaImage from "./assets/banana.jpg"
-import mangoImage from "./assets/mango.jpg"
-import strawberryImage from "./assets/strawberry.jpg"
-
-import carrotImage from "./assets/carrot.jpg"
-import tomatoImage from "./assets/tomato.jpg"
-import onionImage from "./assets/onion.jpg"
-import beansImage from "./assets/beans.jpg"
-
-
-const items = {
-  Fruits: [
-    { name: 'Apple', image: appleImage , price: 1, quantity: 0 },
-    { name: 'Banana', image: bananaImage , price: 1, quantity: 0 },
-    { name: 'Mango', image: mangoImage , price: 1, quantity: 0 },
-    { name: 'Strawberry', image: strawberryImage , price: 1, quantity: 0 },
-    // ... other fruit items
-  ],
-  Vegetables: [
-    { name: 'Carrot', image: carrotImage, price: 0.5, quantity: 0 },
-    { name: 'Tomato', image: tomatoImage, price: 0.5, quantity: 0 },
-    { name: 'Onion', image: onionImage, price: 0.5, quantity: 0 },
-    { name: 'Green Fresh Beans', image: beansImage, price: 0.5, quantity: 0 },
-    // ... other vegetable items
-  ],
-  // ... add other categories with items
-};
+import { items } from "./data/itemsData";
+import { ImBin } from "react-icons/im";
 
 const CategoryPage = ({ cartItems, setCartItems }) => {
   const { name } = useParams();
-  const [itemList, setItemList] = useState(items[name] || []);
+  const [itemList, setItemList] = useState([]);
 
+  // Fetch the items for the selected category whenever 'name' changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    // Set the itemList based on the selected category (name)
+    setItemList(items[name] || []);
+  }, [name]); // This ensures the itemList is updated every time the category changes
+
+  // Function to handle adding an item to the cart
   const addToCart = (item) => {
     const updatedItems = [...cartItems];
     const existingItem = updatedItems.find(i => i.name === item.name);
@@ -46,18 +26,72 @@ const CategoryPage = ({ cartItems, setCartItems }) => {
     setCartItems(updatedItems);
   };
 
+  // Function to handle removing an item from the cart
+  const removeFromCart = (item) => {
+    const updatedItems = cartItems.filter(i => i.name !== item.name);
+    setCartItems(updatedItems);
+  };
+
+  // Function to handle increasing quantity of an item
+  const increaseQuantity = (item) => {
+    const updatedItems = [...cartItems];
+    const existingItem = updatedItems.find(i => i.name === item.name);
+    if (existingItem) {
+      existingItem.quantity += 1;
+    }
+    setCartItems(updatedItems);
+  };
+
+  // Function to handle decreasing quantity of an item
+  const decreaseQuantity = (item) => {
+    const updatedItems = [...cartItems];
+    const existingItem = updatedItems.find(i => i.name === item.name);
+    if (existingItem && existingItem.quantity > 1) {
+      existingItem.quantity -= 1;
+    } else {
+      removeFromCart(item); // Remove item if quantity is 1
+    }
+    setCartItems(updatedItems);
+  };
+
+  // Function to get the cart item for a specific item
+  const getCartItem = (item) => {
+    return cartItems.find(i => i.name === item.name);
+  };
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 p-4">
-      {itemList.map(item => (
-        <div key={item.name} className="border p-4 rounded-xl shadow-lg">
-          <img src={item.image} alt={item.name} className="w-full h-32 object-cover rounded-xl" />
-          <h3 className="text-lg font-semibold">{item.name}</h3>
-          <p>Price: ${item.price.toFixed(2)}</p>
-          <button onClick={() => addToCart(item)} className="bg-blue-500 text-white py-2 px-4 rounded">
-            Add to Cart
-          </button>
-        </div>
-      ))}
+    <div className='flex flex-col container mx-auto mt-40 min-h-screen'>
+      <p className='text-4xl font-bold'>{name} Products</p>
+      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 flex justify-items-center gap-10 p-4 mt-4">
+        {itemList.length > 0 ? (
+          itemList.map(item => {
+            const cartItem = getCartItem(item); // Check if the item is in the cart
+            return (
+              <div key={item.name} className="border w-3/4 p-4 rounded-md shadow-lg">
+                <img src={item.image} alt={item.name} className="w-full h-44 object-scale-down rounded-md border border-[#9c7b02] py-1" />
+                <h3 className="text-lg text-[#0f5286]">{item.name}</h3>
+                <p className='text-lg text-[#0f5286] font-semibold'>${item.price.toFixed(2)}</p>
+
+                {/* Display the Add to Cart button or the quantity controls */}
+                {cartItem ? (
+                  <div className="flex items-center space-x-2 mt-8 border">
+                    <button onClick={() => decreaseQuantity(item)} className="bg-red-500 text-white py-1 px-3 rounded">-</button>
+                    <span className="text-lg font-semibold">{cartItem.quantity}</span>
+                    <button onClick={() => increaseQuantity(item)} className="bg-green-500 text-white py-1 px-3 rounded">+</button>
+                    <button onClick={() => removeFromCart(item)} className="text-[#ffd124] hover:text-[#edbd07] py-1 px-3 rounded"><ImBin className='w-7 h-7'/></button>
+                  </div>
+                ) : (
+                  <button onClick={() => addToCart(item)} className="bg-[#ffd124] font-semibold hover:bg-[#edbd07] py-2 px-4 rounded mt-8">
+                    Add to Cart
+                  </button>
+                )}
+              </div>
+            );
+          })
+        ) : (
+          <p>No products available in this category.</p>
+        )}
+      </div>
     </div>
   );
 };
