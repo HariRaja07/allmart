@@ -1,17 +1,36 @@
-import React, {useEffect} from "react";
+import React, {useState, useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { categories } from "./data/categoriesData";
+import axios from 'axios';
+import image from "./assets/icon/fnv.png";
+const backendUrl = "https://all-mart-e-com-server.onrender.com";
 
 const AllCategory = () => {
   const navigate = useNavigate();
+  const [categories, setCategory] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+          const categoryResponse = await axios.get(`${backendUrl}/api/v1/categories`);
+          // Now extract the categories array from the response data
+          setCategory(categoryResponse.data.data.categories);
+      } catch (error) {
+          console.error('Error fetching categories:', error);
+          setCategory([]); // Fallback to empty array in case of an error
+      }
+  };
+
+    fetchData();
+  }, []);
+
 
   useEffect(() => {
     window.scrollTo(0, 0);  // Scroll to top of the page
   }, []);
 
   const handleCategoryClick = (category) => {
-    navigate(`/category/${category.replace(/\s+/g, '')}`);
+    navigate(`/category/${encodeURIComponent(category)}`);
   };
 
   return (
@@ -38,7 +57,7 @@ const AllCategory = () => {
                 </div>
 
                 <img
-                  src={category.image}
+                  src={image}
                   alt={category.name}
                   className="h-28 w-28"
                 />
