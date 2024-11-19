@@ -11,6 +11,8 @@ import Footer from './components/footer';
 import AllCategory from './AllCategory';
 import TopDeals from './home-page/TopDeals';
 import OffersZone from './home-page/OffersZone';
+import OffersPage from './OffersPage';
+import DealsPage from './DealsPage';
 
 const App = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -27,6 +29,8 @@ const App = () => {
         <Route path="/all-category" element={<AllCategory/>}/>
         <Route path="/top-deals" element={<TopDeals cartItems={cartItems} setCartItems={setCartItems} />} /> {/* TopDeals Route */}
         <Route path="/offers-zone" element={<OffersZone cartItems={cartItems} setCartItems={setCartItems} />} /> {/* OffersZone Route */}
+        <Route path="/offers-page" element={<OffersPage cartItems={cartItems} setCartItems={setCartItems} />} /> {/* OffersZone Route */}
+        <Route path="/deals-page" element={<DealsPage cartItems={cartItems} setCartItems={setCartItems} />} /> {/* OffersZone Route */}
       </Routes>
       <Footer/>
     </Router>

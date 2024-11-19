@@ -7,14 +7,14 @@ import CategoryList from "./CategoryList";
 import OffersZone from "./OffersZone";
 import TopDeals from "./TopDeals";
 
-const Home = () => {
+const Home = ({ cartItems, setCartItems }) => {
 
   return (
     <div className="flex flex-col pt-20">
       <CarouselBanner />
-      <TopDeals />
+      <TopDeals cartItems={cartItems} setCartItems={setCartItems} />
       <CategoryList/>
-      <OffersZone />
+      <OffersZone cartItems={cartItems} setCartItems={setCartItems} />
       <AboutAllMart/> 
     </div>
   );

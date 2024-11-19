@@ -1,5 +1,7 @@
-import React, { useEffect } from "react";
+import React, {useState, useEffect } from "react";
 import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
+const backendUrl = "https://all-mart-e-com-server.onrender.com";
 import grocery from "../assets/grocery.png";
 import electronics from "../assets/electronics.png";
 import beverages from "../assets/beverages.png";
@@ -22,6 +24,22 @@ const categories = [
 
 const CategoryList = () => {
   const navigate = useNavigate();
+  const [homeCategories, setCategory] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+          const categoryResponse = await axios.get(`${backendUrl}/api/v1/homeCategory`);
+          // Now extract the categories array from the response data
+          setCategory(categoryResponse.data.data.homeCategories);
+      } catch (error) {
+          console.error('Error fetching categories:', error);
+          setCategory([]); // Fallback to empty array in case of an error
+      }
+  };
+
+    fetchData();
+  }, []);
 
   // Scroll to top when the component mounts or when "See All Categories" is clicked
   useEffect(() => {
@@ -29,7 +47,7 @@ const CategoryList = () => {
   }, []);
 
   const handleCategoryClick = (category) => {
-    navigate(`/category/${category.replace(/\s+/g, '')}`);
+    navigate(`/category/${encodeURIComponent(category)}`);
   };
 
   return (
@@ -44,11 +62,11 @@ const CategoryList = () => {
         </Link>
       </div>
       <div className="flex flex-row min-w-6xl mx-auto container justify-start gap-8">
-        {categories.map((category) => (
+        {homeCategories.map((category) => (
           <div
             key={category.name}
             className="flex flex-col items-center bg-transparent p-4 hover:shadow-xl transform transition-all duration-300 cursor-pointer"
-            onClick={() => handleCategoryClick(category.name)}
+            onClick={() => handleCategoryClick(category.category?.name)}
           >
             <div className="relative mb-4 flex items-center justify-center">
               {/* Background Circle */}
@@ -61,7 +79,7 @@ const CategoryList = () => {
                 className="h-32 w-32 object-scale-down z-10"
               />
             </div>
-            <h2 className="text-xl font-semibold text-[#0f5286] font-[Roboto]">{category.name}</h2>
+            <h2 className="text-xl font-semibold text-[#0f5286] font-[Roboto]">{category.category?.name}</h2>
           </div>
         ))}
       </div>

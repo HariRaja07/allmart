@@ -42,7 +42,7 @@ const Header = ({ cartItems, setCartItems }) => {
 
     fetchData();
   }, []);
-
+  console.log(cartItems)
   // Toggle dropdown visibility
   const toggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
@@ -154,7 +154,7 @@ const Header = ({ cartItems, setCartItems }) => {
   };
 
   const totalAmount = cartItems.reduce(
-    (sum, item) => sum + item.sellingprice * item.quantity,
+    (sum, item) => sum + (item.discountedPrice ? item.discountedPrice : item.sellingprice) * item.quantity,
     0
   );
 
@@ -285,12 +285,12 @@ const Header = ({ cartItems, setCartItems }) => {
               <p className="font-semibold text-xl">Sorry,Your cart is empty!</p>
             </div>
           ) : (
-            <div>
+            <div className="overflow-y-auto max-h-[calc(100vh-200px)]">
               <ul>
                 {cartItems.map((item) => (
                   <div
                     key={item.name}
-                    className="flex items-center py-4 border-b border-gray-200"
+                    className="flex items-center py-4 border-b border-gray-200 p-2"
                   >
                     <img
                       src={item.image}
@@ -300,7 +300,7 @@ const Header = ({ cartItems, setCartItems }) => {
                     <div className="flex-1">
                       <span className="text-lg font-semibold">{item.name}</span>
                       <div className="text-sm text-gray-600">
-                        <span>Price: ${item.sellingprice.toFixed(2)}</span>
+                        <span>Price: ${item.discountedPrice ? item.discountedPrice.toFixed(2) : item.sellingprice.toFixed(2)}</span>
                       </div>
                       <div className="flex items-center mt-2">
                         <button
@@ -326,7 +326,7 @@ const Header = ({ cartItems, setCartItems }) => {
                       </div>
                     </div>
                     <span className="text-lg font-bold">
-                      ${(item.sellingprice * item.quantity).toFixed(2)}
+                      ${(item.discountedPrice ? item.discountedPrice : item.sellingprice * item.quantity).toFixed(2)}
                     </span>
                     <button
                       onClick={() => removeFromCart(item.name)}

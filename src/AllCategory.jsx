@@ -57,7 +57,7 @@ const AllCategory = () => {
                 </div>
 
                 <img
-                  src={image}
+                  src={category.image}
                   alt={category.name}
                   className="h-28 w-28"
                 />
