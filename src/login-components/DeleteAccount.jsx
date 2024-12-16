@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+const backendUrl = "https://all-mart-e-com-server.onrender.com";
 const DeleteAccount = () => {
   const [reason, setReason] = useState('');
   const [password, setPassword] = useState('');
@@ -8,7 +8,7 @@ const DeleteAccount = () => {
 
   const handleDelete = async () => {
     const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:5000/api/v1/users/delete-account', {
+    const response = await fetch(`${backendUrl}/api/v1/users/delete-account`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -45,7 +45,7 @@ const Header = ({ cartItems, setCartItems }) => {
   const fetchUserDetails = async () => {
     try {
       const token = localStorage.getItem('token');  // Or from Redux or Context API
-      const response = await fetch('http://localhost:5000/api/v1/users/details', {
+      const response = await fetch(`${backendUrl}/api/v1/users/details`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { TbEdit } from "react-icons/tb";
-
+const backendUrl = "https://all-mart-e-com-server.onrender.com";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ const Profile = () => {
     const fetchUserDetails = async () => {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        "http://localhost:5000/api/v1/users/details",
+        `${backendUrl}/api/v1/users/details`,
         {
           headers: {
             "x-auth-token": token,
@@ -40,7 +40,7 @@ const Profile = () => {
   const handleSaveDetails = async () => {
     const token = localStorage.getItem("token");
     const response = await fetch(
-      "http://localhost:5000/api/v1/users/save-details",
+      `${backendUrl}/api/v1/users/save-details`,
       {
         method: "POST",
         headers: {

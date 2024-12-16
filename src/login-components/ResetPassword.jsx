@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-
+const backendUrl = "https://all-mart-e-com-server.onrender.com";
 export default function ResetPassword() {
   const { token } = useParams();
   const [password, setPassword] = useState('');
@@ -12,7 +12,7 @@ export default function ResetPassword() {
   const handleResetPassword = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`http://localhost:5000/api/v1/users/reset-password/${token}`, { password });
+      const response = await axios.post(`${backendUrl}/api/v1/users/reset-password/${token}`, { password });
       setMessage(response.data.message);
       setError('');
       setTimeout(() => navigate('/login'), 3000); // Navigate to login after success
@@ -24,7 +24,7 @@ export default function ResetPassword() {
 
   return (
     <div className="max-w-md mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Reset Password</h2>
+      <h2 className="text-4xl text-[#b70c0c] font-bold mb-16">Reset Password</h2>
       <form onSubmit={handleResetPassword}>
         <div className="mb-4">
           <label htmlFor="password" className="block text-sm font-semibold">New Password</label>
@@ -33,13 +33,13 @@ export default function ResetPassword() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded mt-1"
+            className="w-full p-2 rounded-full bg-[#fbc7c7]/50 mt-1"
             required
           />
         </div>
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+          className="w-1/2 bg-[#b70c0c] text-white py-2 rounded-full hover:bg-[#920a0a]"
         >
           Reset Password
         </button>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-
+const backendUrl = "https://all-mart-e-com-server.onrender.com";
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
@@ -9,7 +9,7 @@ export default function ForgotPassword() {
   const handleForgotPassword = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/v1/users/forgot-password', { email });
+      const response = await axios.post(`${backendUrl}/api/v1/users/forgot-password`, { email });
       setMessage(response.data.message);
       setError('');
     } catch (err) {
@@ -20,7 +20,7 @@ export default function ForgotPassword() {
 
   return (
     <div className="max-w-md mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Forgot Password</h2>
+      <h2 className="text-4xl text-[#b70c0c] font-bold mb-16">Forgot Password</h2>
       <form onSubmit={handleForgotPassword}>
         <div className="mb-4">
           <label htmlFor="email" className="block text-sm font-semibold">Email Address</label>
@@ -29,13 +29,13 @@ export default function ForgotPassword() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded mt-1"
+            className="w-full p-2 rounded-full bg-[#fbc7c7]/50 mt-1"
             required
           />
         </div>
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+          className="w-1/2 bg-[#b70c0c] text-white py-2 rounded-full hover:bg-[#920a0a]"
         >
           Send Reset Link
         </button>

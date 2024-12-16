@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+const backendUrl = "https://all-mart-e-com-server.onrender.com";
 export default function SignUp() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,7 +13,7 @@ export default function SignUp() {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/v1/users/signup', { email, password });
+      const response = await axios.post(`${backendUrl}/api/v1/users/signup`, { email, password });
       setIsOtpSent(true);
       setError('');
     } catch (err) {
@@ -24,7 +24,7 @@ export default function SignUp() {
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/v1/users/verify-otp', { email, otp });
+      await axios.post(`${backendUrl}/api/v1/users/verify-otp`, { email, otp });
       navigate('/login');
     } catch (err) {
       setError(err.response?.data?.message || 'Error during OTP verification');
