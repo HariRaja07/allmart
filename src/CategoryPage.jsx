@@ -11,6 +11,9 @@ const CategoryPage = ({ cartItems, setCartItems }) => {
   const [loading, setLoading] = useState(true);  // Loading state to handle the request
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  useEffect(() => {
+      window.scrollTo(0, 0);  // Scroll to top of the page
+    }, []);
   // Fetch the items for the selected category whenever 'name' changes
   useEffect(() => {
     const fetchItems = async () => {
@@ -96,26 +99,26 @@ const CategoryPage = ({ cartItems, setCartItems }) => {
               const cartItem = getCartItem(item);  // Check if the item is in the cart
               return (
                 <div key={item._id} 
-                className="border w-3/4 p-4 rounded-md shadow-lg"
+                className="bg-gray-100 w-3/4 p-4 rounded-md shadow-lg"
                 onClick={(e) => {
                   // Prevent modal from opening when clicking on the "Add to Cart" button
                   if (e.target.closest('button')) return;
                   openModal(item); // Open modal when clicking on the card (excluding the "Add to Cart" button)
                 }}>
-                  <img src={item.image} alt={item.name} className="w-full h-44 object-scale-down rounded-md border border-[#9c7b02] py-1" />
-                  <h3 className="text-lg text-[#0f5286]">{item.name}</h3>
-                  <p className='text-lg text-[#0f5286] font-semibold'>${item.sellingprice.toFixed(2)}</p>
+                  <img src={item.image} alt={item.name} className="w-full h-44 object-scale-down rounded-md bg-white shadow-xl py-1" />
+                  <h3 className="text-lg font-bold text-[#0f5286] mt-4">{item.name}</h3>
+                  <p className='text-lg text-gray-800 font-semibold'>${item.sellingprice.toFixed(2)}</p>
 
                   {/* Display the Add to Cart button or the quantity controls */}
                   {cartItem ? (
-                    <div className="flex items-center space-x-2 mt-8 border">
+                    <div className="flex items-center space-x-2 mt-8">
                       <button onClick={() => decreaseQuantity(item)} className="bg-red-500 text-white py-1 px-3 rounded">-</button>
                       <span className="text-lg font-semibold">{cartItem.quantity}</span>
                       <button onClick={() => increaseQuantity(item)} className="bg-green-500 text-white py-1 px-3 rounded">+</button>
                       <button onClick={() => removeFromCart(item)} className="text-[#ffd124] hover:text-[#edbd07] py-1 px-3 rounded"><ImBin className='w-7 h-7'/></button>
                     </div>
                   ) : (
-                    <button onClick={() => addToCart(item)} className="bg-[#ffd124] font-semibold hover:bg-[#edbd07] py-2 px-4 rounded mt-8">
+                    <button onClick={() => addToCart(item)} className="bg-[#ffd124] font-semibold hover:bg-[#edbd07] py-2 px-4 shadow-md rounded mt-8">
                       Add to Cart
                     </button>
                   )}
@@ -144,7 +147,7 @@ const CategoryPage = ({ cartItems, setCartItems }) => {
               <div className="flex flex-col justify-start space-y-2">
                 <div className='flex flex-col justify-start space-y-1 border-b py-2 border-[#ab9852]'>
                 <h2 className="text-4xl font-semibold text-[#0f5286]">{selectedProduct.name}</h2>
-                <p className="text-sm font-semibold text-[#e81e25]">Brand ID: {selectedProduct.brand}</p>
+                <p className="text-sm font-semibold text-[#e81e25]">Brand ID: {selectedProduct.brand.name}</p>
                 </div>
                 <div className='flex flex-col justify-start space-y-1 border-b py-2 border-[#ab9852]'>
                 <p className="text-base font-semibold text-gray-700">Description:</p>

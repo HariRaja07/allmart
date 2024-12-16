@@ -6,6 +6,7 @@ import AboutAllMart from "./AboutAllMart";
 import CategoryList from "./CategoryList";
 import OffersZone from "./OffersZone";
 import TopDeals from "./TopDeals";
+import LatestProducts from "./LatestProducts";
 
 const Home = ({ cartItems, setCartItems }) => {
 
@@ -15,6 +16,7 @@ const Home = ({ cartItems, setCartItems }) => {
       <TopDeals cartItems={cartItems} setCartItems={setCartItems} />
       <CategoryList/>
       <OffersZone cartItems={cartItems} setCartItems={setCartItems} />
+      <LatestProducts cartItems={cartItems} setCartItems={setCartItems} />
       <AboutAllMart/> 
     </div>
   );

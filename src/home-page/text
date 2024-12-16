@@ -1,0 +1,39 @@
+{selectedProduct && (
+  <>
+    {console.log(selectedProduct)} {/* Log the selected product */}
+    <div className="fixed inset-0 bg-black bg-opacity-25 flex justify-center items-center z-50">
+      <div className="flex flex-col space-y-2 bg-white p-4 rounded-lg max-w-6xl w-full">
+        <div className="flex justify-end">
+          <button onClick={closeModal} className="font-bold text-2xl text-gray-700">
+            &times;
+          </button>
+        </div>
+
+        {/* Render selected product details */}
+        <div className="flex flex-col">
+          <p><strong>Name:</strong> {selectedProduct.name}</p>  {/* Access 'name' property */}
+          <p><strong>Description:</strong> {selectedProduct.desc}</p>  {/* Access 'desc' property */}
+          <p><strong>Brand:</strong> {selectedProduct.brand.name}</p>  {/* Access 'brand.name' */}
+          <p><strong>Category:</strong> {selectedProduct.category.name}</p>  {/* Access 'category.name' */}
+          <p><strong>Cost Price:</strong> {selectedProduct.costPrice}</p>  {/* Access 'costPrice' */}
+          <p><strong>Selling Price:</strong> {selectedProduct.sellingprice}</p>  {/* Access 'sellingprice' */}
+          <p><strong>Stock:</strong> {selectedProduct.stock}</p>  {/* Access 'stock' */}
+
+          {/* Display the image */}
+          <img 
+            src={selectedProduct.image} 
+            alt={selectedProduct.name} 
+            className="w-full h-auto rounded-md" 
+          />
+
+          {/* Optionally, you can display the QR code */}
+          <img 
+            src={selectedProduct.qrcode} 
+            alt="QR code" 
+            className="w-24 h-24 rounded-md" 
+          />
+        </div>
+      </div>
+    </div>
+  </>
+)}

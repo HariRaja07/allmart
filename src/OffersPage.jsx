@@ -11,6 +11,10 @@ const OffersPage = ({ cartItems, setCartItems }) => {
   const [loading, setLoading] = useState(true);  // Loading state to handle the request
   const [selectedProduct, setSelectedProduct] = useState(null);
   // Fetch the items for the selected category whenever 'name' changes
+  
+  useEffect(() => {
+      window.scrollTo(0, 0);  // Scroll to top of the page
+    }, []);
   useEffect(() => {
     const fetchoffers = async () => {
       try {
@@ -27,6 +31,7 @@ const OffersPage = ({ cartItems, setCartItems }) => {
     fetchoffers();
   }, []);  // This effect runs when the 'name' parameter (category) changes
 
+  
   // Function to handle adding an item to the cart
   const addToCart = (item) => {
     const discountedPrice = item.product?.sellingprice - (item.product?.sellingprice * (item.discount / 100));
@@ -150,7 +155,7 @@ const OffersPage = ({ cartItems, setCartItems }) => {
               <div className="flex flex-col justify-start space-y-2">
                 <div className='flex flex-col justify-start space-y-1 border-b py-2 border-[#ab9852]'>
                 <h2 className="text-4xl font-semibold text-[#0f5286]">{selectedProduct.product.name}</h2>
-                <p className="text-sm font-semibold text-[#e81e25]">Brand ID: {selectedProduct.product.brand}</p>
+                <p className="text-sm font-semibold text-[#e81e25]">Brand ID: {selectedProduct.product.brand.name}</p>
                 </div>
                 <div className='flex flex-col justify-start space-y-1 border-b py-2 border-[#ab9852]'>
                 <p className="text-base font-semibold text-gray-700">Description:</p>
