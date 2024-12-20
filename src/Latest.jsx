@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';  // To make API calls
 import { ImBin } from "react-icons/im";
 
-const backendUrl = "https://all-mart-e-com-server.onrender.com"; // Replace with your actual backend URL
+const backendUrl = "https://allmart-ecom-server.onrender.com"; // Replace with your actual backend URL
 
 const Latest = ({ cartItems, setCartItems }) => {
   const [itemList, setItemList] = useState([]);  // Store the items for the current category

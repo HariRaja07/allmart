@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-const backendUrl = "https://all-mart-e-com-server.onrender.com";
+const backendUrl = "https://allmart-ecom-server.onrender.com";
 export default function ResetPassword() {
   const { token } = useParams();
   const [password, setPassword] = useState('');

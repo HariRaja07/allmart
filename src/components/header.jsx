@@ -10,7 +10,8 @@ import { FaHome } from "react-icons/fa";
 import axios from "axios";
 import CartComponent from "./cartComponent";
 import LoginComponent from "./loginComponent";
-const backendUrl = "https://all-mart-e-com-server.onrender.com";
+import WishlistComponent from "./wishlistComponent";
+const backendUrl = "https://allmart-ecom-server.onrender.com";
 
 const Header = ({ cartItems, setCartItems }) => {
   const navigate = useNavigate(); // Initialize useNavigate
@@ -252,12 +253,7 @@ const Header = ({ cartItems, setCartItems }) => {
             />
           </div>
 
-          <div className="flex flex-col items-center text-[#0f5286] hover:text-[#3b8ccb]">
-            <BsBookmarkHeartFill className="w-7 h-7" />
-            <span className="text-sm font-[Roboto] font-semibold">
-              Wishlist
-            </span>
-          </div>
+          <WishlistComponent isLoggedIn={isLoggedIn} userName={userName}/>
           <LoginComponent isLoggedIn={isLoggedIn} userName={userName} />
           <CartComponent cartItems={cartItems} setCartItems={setCartItems} />
         </div>
@@ -267,7 +263,7 @@ const Header = ({ cartItems, setCartItems }) => {
 
       {/* Shop by Category Button - visible when scrolled down */}
       {!scrolling && (
-        <div className="relative z-10 px-4 py-2 bg-[#faf2d4]/50 flex flex-row space-x-4">
+        <div className="relative px-4 py-2 bg-[#faf2d4]/50 flex flex-row space-x-4">
           <button
             onClick={() => navigate("/")}
             className="w-full md:w-auto px-6 py-3 bg-[#ffd124] font-semibold rounded-md shadow-lg hover:bg-[#edbd07] transition duration-300 flex flex-row items-center space-x-2"

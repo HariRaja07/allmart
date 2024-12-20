@@ -36,7 +36,7 @@ const UserLayout = () => {
             </Link>
 
             <Link
-              to="/user/wishlist"
+              to="/wishlist"
               onClick={() => handleNavClick("Wishlist")}
               className={`flex items-center space-x-4 p-4 rounded-lg w-full transition-colors ${
                 selectedNav === "Wishlist" ? "bg-blue-500 text-white hover:bg-blue-600" : "text-gray-700 hover:bg-blue-100"

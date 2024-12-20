@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-const backendUrl = "https://all-mart-e-com-server.onrender.com";
+const backendUrl = "https://allmart-ecom-server.onrender.com";
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');

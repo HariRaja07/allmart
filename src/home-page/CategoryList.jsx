@@ -1,7 +1,7 @@
 import React, {useState, useEffect } from "react";
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-const backendUrl = "https://all-mart-e-com-server.onrender.com";
+const backendUrl = "https://allmart-ecom-server.onrender.com";
 import grocery from "../assets/grocery.png";
 import electronics from "../assets/electronics.png";
 import beverages from "../assets/beverages.png";

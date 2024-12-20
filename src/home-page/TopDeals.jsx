@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { ImBin } from "react-icons/im";
 import axios from "axios";
 
-const backendUrl = "https://all-mart-e-com-server.onrender.com"; // Replace with your actual backend URL
+const backendUrl = "https://allmart-ecom-server.onrender.com"; // Replace with your actual backend URL
 
 const TopDeals = ({ cartItems, setCartItems }) => {
   const navigate = useNavigate();

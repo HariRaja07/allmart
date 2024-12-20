@@ -22,6 +22,7 @@ import ForgotPassword from './login-components/ForgotPassword';
 import DeleteAccount from './login-components/DeleteAccount';
 import LatestProducts from './home-page/LatestProducts';
 import Latest from './Latest';
+import WishlistPage from './WishlistPage';
 
 const App = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -43,6 +44,7 @@ const App = () => {
           <Route path="/deals-page" element={<DealsPage cartItems={cartItems} setCartItems={setCartItems} />} />
           <Route path="/latest-products" element={<LatestProducts cartItems={cartItems} setCartItems={setCartItems} />} />
           <Route path="/latest" element={<Latest cartItems={cartItems} setCartItems={setCartItems} />} />
+          <Route path="wishlist" element={<WishlistPage cartItems={cartItems} setCartItems={setCartItems}/>}/>
           <Route path="/user" element={<UserLayout/>}>
             <Route path="profile" element={<Profile />} />
             <Route path="delete-account" element={<DeleteAccount />} />

@@ -1,0 +1,142 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { ImBin } from "react-icons/im"; // Bin icon for deleting items
+import { FaRegHeart, FaHeart } from "react-icons/fa"; // Heart icons for wishlist
+
+const backendUrl = "http://localhost:5000"; // Replace with your actual backend URL
+
+const WishlistPage = ({ cartItems, setCartItems }) => {
+  const [wishlistItems, setWishlistItems] = useState([]); // Store the items in the user's wishlist
+  const [isUpdatingWishlist, setIsUpdatingWishlist] = useState(false); // Track the state of wishlist updating
+  const [removeMessage, setRemoveMessage] = useState(""); // State to hold the removal success message
+
+  // Function to get the JWT token from localStorage
+  const getToken = () => localStorage.getItem("token");
+
+  // Fetch user's wishlist
+  const fetchWishlist = async () => {
+    const token = getToken();
+    if (!token) return;
+
+    try {
+      const response = await axios.get(`${backendUrl}/api/v1/users/wishlist`, {
+        headers: {
+          "x-auth-token": token,
+        },
+      });
+      setWishlistItems(response.data.data); // Set wishlist items
+    } catch (error) {
+      console.error("Error fetching wishlist:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchWishlist(); // Fetch wishlist on component mount
+  }, []);
+
+  // Handle removing an item from the wishlist
+  const removeFromWishlist = async (itemId) => {
+    const token = getToken();
+    if (!token) return;
+
+    setIsUpdatingWishlist(true); // Start updating wishlist
+
+    try {
+      await axios.delete(`${backendUrl}/api/v1/users/wishlist/remove`, {
+        headers: {
+          "x-auth-token": token,
+        },
+        data: { productId: itemId },
+      });
+
+      // Immediately update the state to reflect the item removal
+      setWishlistItems((prevItems) =>
+        prevItems.filter((item) => item.productId._id !== itemId)
+      );
+
+      // Show success message with animation
+      setRemoveMessage("Item removed successfully!");
+
+      // Hide the success message after 2 seconds
+      setTimeout(() => {
+        setRemoveMessage(""); // Hide the success message
+      }, 2000);
+
+    } catch (error) {
+      console.error("Error removing item from wishlist:", error);
+    } finally {
+      setIsUpdatingWishlist(false); // Stop updating wishlist
+    }
+  };
+
+  // Function to handle adding an item to the cart
+  const addToCart = (item) => {
+    const updatedItems = [...cartItems];
+    const existingItem = updatedItems.find((i) => i.name === item.name);
+    if (existingItem) {
+      existingItem.quantity += 1;
+    } else {
+      updatedItems.push({ ...item, quantity: 1 });
+    }
+    setCartItems(updatedItems);
+  };
+
+  return (
+    <div className="flex flex-col container mx-auto mt-20 min-h-screen">
+      <h1 className="text-4xl font-bold mb-8">Your Wishlist</h1>
+
+      {wishlistItems.length === 0 ? (
+        <p className="text-xl font-semibold">Your wishlist is empty.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+          {wishlistItems.map((item) => (
+            <div
+              key={item.productId._id}
+              className="bg-gray-100 w-full p-4 rounded-md shadow-lg relative"
+            >
+              <img
+                src={item.productId.image}
+                alt={item.productId.name}
+                className="w-full h-44 object-scale-down rounded-md bg-white shadow-xl py-1"
+              />
+              <h3 className="text-lg font-bold text-[#0f5286] mt-4">{item.productId.name}</h3>
+              <p className="text-lg text-gray-800 font-semibold">
+                ${item.productId.sellingprice.toFixed(2)}
+              </p>
+
+              {/* Delete button (to remove item from wishlist) */}
+              <button
+                onClick={() => removeFromWishlist(item.productId._id)}
+                className="absolute top-4 right-4 text-red-500 hover:text-red-700"
+              >
+                <ImBin className="w-6 h-6" />
+              </button>
+
+              {/* Success message animation */}
+              {removeMessage && (
+                <div
+                  className="absolute bottom-4 left-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-md transition-all duration-500 opacity-100"
+                  style={{
+                    animation: "fadeOut 2s ease-out forwards",
+                  }}
+                >
+                  {removeMessage}
+                </div>
+              )}
+
+              {/* Add to Cart button */}
+              <button
+                onClick={() => addToCart(item.productId)}
+                className="bg-[#ffd124] hover:bg-[#edbd07] text-black font-semibold py-2 px-6 rounded-md mt-6 w-full"
+              >
+                Add to Cart
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default WishlistPage;

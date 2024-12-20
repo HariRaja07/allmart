@@ -1,40 +1,128 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import axios from 'axios';  // To make API calls
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios"; // To make API calls
 import { ImBin } from "react-icons/im";
+import { FaRegHeart, FaHeart } from "react-icons/fa"; // Heart icons for wishlist
 
-const backendUrl = "https://all-mart-e-com-server.onrender.com"; // Replace with your actual backend URL
+const backendUrl = "https://allmart-ecom-server.onrender.com"; // Replace with your actual backend URL
 
 const CategoryPage = ({ cartItems, setCartItems }) => {
-  const { name } = useParams();  // Get category name from URL
-  const [itemList, setItemList] = useState([]);  // Store the items for the current category
-  const [loading, setLoading] = useState(true);  // Loading state to handle the request
+  const { name } = useParams(); // Get category name from URL
+  const [itemList, setItemList] = useState([]); // Store the items for the current category
+  const [loading, setLoading] = useState(true); // Loading state to handle the request
+  const [wishlist, setWishlist] = useState([]); // Track user's wishlist items
+  const [isUpdatingWishlist, setIsUpdatingWishlist] = useState(false); // Track wishlist update status
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  // Function to get the JWT token from localStorage
+  const getToken = () => localStorage.getItem("token");
+  //console.log(localStorage.getItem('token'));  // Check if token is set
+
   useEffect(() => {
-      window.scrollTo(0, 0);  // Scroll to top of the page
-    }, []);
+    window.scrollTo(0, 0); // Scroll to top of the page
+  }, []);
+
   // Fetch the items for the selected category whenever 'name' changes
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        setLoading(true);  // Set loading state before fetching data
-        const response = await axios.get(`${backendUrl}/api/v1/product/category/${name}`);
-        setItemList(response.data.data);  // Set the product list based on category
-        setLoading(false);  // Set loading to false once data is fetched
+        setLoading(true); // Set loading state before fetching data
+        const response = await axios.get(
+          `${backendUrl}/api/v1/product/category/${name}`
+        );
+        setItemList(response.data.data); // Set the product list based on category
+        setLoading(false); // Set loading to false once data is fetched
       } catch (error) {
-        console.error('Error fetching products:', error);
-        setLoading(false);  // Stop loading even if there's an error
+        console.error("Error fetching products:", error);
+        setLoading(false); // Stop loading even if there's an error
       }
     };
 
     fetchItems();
-  }, [name]);  // This effect runs when the 'name' parameter (category) changes
+  }, [name]); // This effect runs when the 'name' parameter (category) changes
+
+  const fetchWishlist = async () => {
+    const token = getToken();
+
+    if (!token) return; // If no token, skip fetching wishlist
+
+    try {
+      const response = await axios.get(
+        `${backendUrl}/api/v1/users/wishlist`,
+        {
+          headers: {
+            "x-auth-token": token, // Include JWT token in headers
+          },
+        }
+      );
+      // Map wishlist to product IDs
+      const pId = response.data.data.map((item) => item.productId._id);
+      setWishlist(pId);
+      console.log(pId);
+    } catch (error) {
+      console.error("Error fetching wishlist:", error);
+    }
+  };
+  // Fetch user's wishlist on page load
+  useEffect(() => {
+    fetchWishlist();
+  }, []); // This will run only once when the component is first mounted
+  // Only fetch wishlist once, when the component is first rendered
+
+  // Function to handle adding/removing item from wishlist
+  const toggleWishlist = async (item) => {
+    const token = getToken();
+    if (!token) return; // If no token, skip adding/removing from wishlist
+
+    setIsUpdatingWishlist(true); // Set loading state while updating wishlist
+
+    try {
+      if (wishlist.includes(item._id)) {
+        // If item is already in wishlist, remove it
+        const response = await axios.delete(
+          `${backendUrl}/api/v1/users/wishlist/remove`,
+          {
+            headers: {
+              "x-auth-token": token,
+            },
+            data: { productId: item._id },
+          }
+        );
+        // Remove from local state
+        setWishlist(wishlist.filter((id) => id !== item._id));
+      } else {
+        // If item is not in wishlist, add it
+        const response = await axios.post(
+          `${backendUrl}/api/v1/users/wishlist/add`,
+          {
+            productId: item._id,
+          },
+          {
+            headers: {
+              "x-auth-token": token,
+            },
+          }
+        );
+        // Add to local state
+        setWishlist([...wishlist, item._id]);
+      }
+
+      // Refetch wishlist to make sure the state is synchronized
+      //fetchWishlist(); // Call the same fetch function you use to load wishlist
+    } catch (error) {
+      console.error("Error toggling wishlist:", error);
+      if (error.response && error.response.status === 401) {
+        alert("Session expired. Please log in again.");
+      }
+    } finally {
+      setIsUpdatingWishlist(false); // Reset loading state
+    }
+  };
 
   // Function to handle adding an item to the cart
   const addToCart = (item) => {
     const updatedItems = [...cartItems];
-    const existingItem = updatedItems.find(i => i.name === item.name);
+    const existingItem = updatedItems.find((i) => i.name === item.name);
     if (existingItem) {
       existingItem.quantity += 1;
     } else {
@@ -45,14 +133,14 @@ const CategoryPage = ({ cartItems, setCartItems }) => {
 
   // Function to handle removing an item from the cart
   const removeFromCart = (item) => {
-    const updatedItems = cartItems.filter(i => i.name !== item.name);
+    const updatedItems = cartItems.filter((i) => i.name !== item.name);
     setCartItems(updatedItems);
   };
 
   // Function to handle increasing quantity of an item
   const increaseQuantity = (item) => {
     const updatedItems = [...cartItems];
-    const existingItem = updatedItems.find(i => i.name === item.name);
+    const existingItem = updatedItems.find((i) => i.name === item.name);
     if (existingItem) {
       existingItem.quantity += 1;
     }
@@ -62,7 +150,7 @@ const CategoryPage = ({ cartItems, setCartItems }) => {
   // Function to handle decreasing quantity of an item
   const decreaseQuantity = (item) => {
     const updatedItems = [...cartItems];
-    const existingItem = updatedItems.find(i => i.name === item.name);
+    const existingItem = updatedItems.find((i) => i.name === item.name);
     if (existingItem && existingItem.quantity > 1) {
       existingItem.quantity -= 1;
     } else {
@@ -73,7 +161,7 @@ const CategoryPage = ({ cartItems, setCartItems }) => {
 
   // Function to get the cart item for a specific item
   const getCartItem = (item) => {
-    return cartItems.find(i => i.name === item.name);
+    return cartItems.find((i) => i.name === item.name);
   };
 
   const openModal = (product) => {
@@ -86,8 +174,8 @@ const CategoryPage = ({ cartItems, setCartItems }) => {
   };
 
   return (
-    <div className='flex flex-col container mx-auto mt-40 min-h-screen'>
-      <p className='text-4xl font-bold'>{name} Products</p>
+    <div className="flex flex-col container mx-auto mt-40 min-h-screen">
+      <p className="text-4xl font-bold">{name} Products</p>
 
       {/* Loading state */}
       {loading ? (
@@ -95,30 +183,75 @@ const CategoryPage = ({ cartItems, setCartItems }) => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 flex justify-items-center gap-10 p-4 mt-4">
           {itemList.length > 0 ? (
-            itemList.map(item => {
-              const cartItem = getCartItem(item);  // Check if the item is in the cart
+            itemList.map((item) => {
+              const isInWishlist = wishlist.includes(item._id); // Check if item is in wishlist
               return (
-                <div key={item._id} 
-                className="bg-gray-100 w-3/4 p-4 rounded-md shadow-lg"
-                onClick={(e) => {
-                  // Prevent modal from opening when clicking on the "Add to Cart" button
-                  if (e.target.closest('button')) return;
-                  openModal(item); // Open modal when clicking on the card (excluding the "Add to Cart" button)
-                }}>
-                  <img src={item.image} alt={item.name} className="w-full h-44 object-scale-down rounded-md bg-white shadow-xl py-1" />
-                  <h3 className="text-lg font-bold text-[#0f5286] mt-4">{item.name}</h3>
-                  <p className='text-lg text-gray-800 font-semibold'>${item.sellingprice.toFixed(2)}</p>
+                <div
+                  key={item._id}
+                  className="bg-gray-100 w-3/4 p-4 rounded-md shadow-lg relative"
+                  onClick={(e) => {
+                    // Prevent modal from opening when clicking on the "Add to Cart" button
+                    if (e.target.closest("button")||e.target.closest(".wishlist-icon")) return;
+                    openModal(item); // Open modal when clicking on the card (excluding the "Add to Cart" button)
+                  }}
+                >
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-44 object-scale-down rounded-md bg-white shadow-xl py-1"
+                  />
+
+                  <h3 className="text-lg font-bold text-[#0f5286] mt-4">
+                    {item.name}
+                  </h3>
+                  <p className="text-lg text-gray-800 font-semibold">
+                    ${item.sellingprice.toFixed(2)}
+                  </p>
+
+                  {/* Wishlist Icon */}
+                  <div
+                    className={`wishlist-icon absolute top-6 right-6 cursor-pointer transition-all duration-300 
+      ${isInWishlist ? "text-red-600" : "text-red-600"} 
+      ${isInWishlist && !isUpdatingWishlist ? "transform scale-110" : ""}`}
+                    onClick={() => !isUpdatingWishlist && toggleWishlist(item)}
+                  >
+                    {isInWishlist ? (
+                      <FaHeart className="w-6 h-6" />
+                    ) : (
+                      <FaRegHeart className="w-6 h-6" />
+                    )}
+                  </div>
 
                   {/* Display the Add to Cart button or the quantity controls */}
-                  {cartItem ? (
+                  {getCartItem(item) ? (
                     <div className="flex items-center space-x-2 mt-8">
-                      <button onClick={() => decreaseQuantity(item)} className="bg-red-500 text-white py-1 px-3 rounded">-</button>
-                      <span className="text-lg font-semibold">{cartItem.quantity}</span>
-                      <button onClick={() => increaseQuantity(item)} className="bg-green-500 text-white py-1 px-3 rounded">+</button>
-                      <button onClick={() => removeFromCart(item)} className="text-[#ffd124] hover:text-[#edbd07] py-1 px-3 rounded"><ImBin className='w-7 h-7'/></button>
+                      <button
+                        onClick={() => decreaseQuantity(item)}
+                        className="bg-red-500 text-white py-1 px-3 rounded"
+                      >
+                        -
+                      </button>
+                      <span className="text-lg font-semibold">
+                        {getCartItem(item).quantity}
+                      </span>
+                      <button
+                        onClick={() => increaseQuantity(item)}
+                        className="bg-green-500 text-white py-1 px-3 rounded"
+                      >
+                        +
+                      </button>
+                      <button
+                        onClick={() => removeFromCart(item)}
+                        className="text-[#ffd124] hover:text-[#edbd07] py-1 px-3 rounded"
+                      >
+                        <ImBin className="w-7 h-7" />
+                      </button>
                     </div>
                   ) : (
-                    <button onClick={() => addToCart(item)} className="bg-[#ffd124] font-semibold hover:bg-[#edbd07] py-2 px-4 shadow-md rounded mt-8">
+                    <button
+                      onClick={() => addToCart(item)}
+                      className="bg-[#ffd124] font-semibold hover:bg-[#edbd07] py-2 px-4 shadow-md rounded mt-8"
+                    >
                       Add to Cart
                     </button>
                   )}
@@ -133,50 +266,50 @@ const CategoryPage = ({ cartItems, setCartItems }) => {
 
       {/* Modal Popup */}
       {selectedProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-25 flex justify-center items-center z-50">
-          <div className="flex flex-col space-y-2 bg-white p-4 rounded-lg max-w-6xl w-full">
-            <div className='flex justify-end '>
-            <button onClick={closeModal} className=" font-bold text-2xl text-gray-700">&times;</button>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-                <div className='flex justify-center border p-2'>
-                <img src={selectedProduct.image} alt={selectedProduct.name} className="flex items-center w-72 h-96 object-scale-down border rounded-md" />
-                </div>
-              
-              <div className="flex flex-col justify-start space-y-2">
-                <div className='flex flex-col justify-start space-y-1 border-b py-2 border-[#ab9852]'>
-                <h2 className="text-4xl font-semibold text-[#0f5286]">{selectedProduct.name}</h2>
-                <p className="text-sm font-semibold text-[#e81e25]">Brand ID: {selectedProduct.brand.name}</p>
-                </div>
-                <div className='flex flex-col justify-start space-y-1 border-b py-2 border-[#ab9852]'>
-                <p className="text-base font-semibold text-gray-700">Description:</p>
-                <p className="text-sm font-semibold text-gray-600">{selectedProduct.desc}</p>
-                </div>
-
-                <div className="flex flex-col">
-                        <p className="text-2xl font-semibold border-b py-2 border-[#ab9852] text-gray-700">M.R.P.:${selectedProduct.sellingprice}</p>
-                      </div>
-                
-                
-                {/* Add to Cart Section */}
-                {getCartItem(selectedProduct) ? (
-                  <div className="flex items-center space-x-2 mt-8 border">
-                    <button onClick={() => decreaseQuantity(selectedProduct)} className="bg-red-500 text-white py-1 px-3 rounded">-</button>
-                    <span className="text-lg font-semibold">{getCartItem(selectedProduct).quantity}</span>
-                    <button onClick={() => increaseQuantity(selectedProduct)} className="bg-green-500 text-white py-1 px-3 rounded">+</button>
-                    <button onClick={() => removeFromCart(selectedProduct)} className="text-[#ffd124] hover:text-[#edbd07] py-1 px-3 rounded"><ImBin className='w-7 h-7'/></button>
+              <div className="fixed inset-0 bg-black bg-opacity-25 flex justify-center items-center z-50">
+                <div className="flex flex-col space-y-2 bg-white p-4 rounded-lg max-w-6xl w-full">
+                  <div className='flex justify-end '>
+                  <button onClick={closeModal} className=" font-bold text-2xl text-gray-700">&times;</button>
                   </div>
-                ) : (
-                  <button onClick={() => addToCart(selectedProduct)} className="bg-[#ffd124] hover:bg-[#edbd07] text-black font-semibold py-2 px-6 rounded-md mt-8">
-                    Add to Cart
-                  </button>
-                )}
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                      <div className='flex justify-center border p-2'>
+                      <img src={selectedProduct.image} alt={selectedProduct.name} className="flex items-center w-72 h-96 object-scale-down border rounded-md" />
+                      </div>
+                    
+                    <div className="flex flex-col justify-start space-y-2">
+                      <div className='flex flex-col justify-start space-y-1 border-b py-2 border-[#ab9852]'>
+                      <h2 className="text-4xl font-semibold text-[#0f5286]">{selectedProduct.name}</h2>
+                      <p className="text-sm font-semibold text-[#e81e25]">Brand ID: {selectedProduct.brand.name}</p>
+                      </div>
+                      <div className='flex flex-col justify-start space-y-1 border-b py-2 border-[#ab9852]'>
+                      <p className="text-base font-semibold text-gray-700">Description:</p>
+                      <p className="text-sm font-semibold text-gray-600">{selectedProduct.desc}</p>
+                      </div>
+      
+                      <div className="flex flex-col">
+                              <p className="text-2xl font-semibold border-b py-2 border-[#ab9852] text-gray-700">M.R.P.:${selectedProduct.sellingprice}</p>
+                            </div>
+                      
+                      
+                      {/* Add to Cart Section */}
+                      {getCartItem(selectedProduct) ? (
+                        <div className="flex items-center space-x-2 mt-8 border">
+                          <button onClick={() => decreaseQuantity(selectedProduct)} className="bg-red-500 text-white py-1 px-3 rounded">-</button>
+                          <span className="text-lg font-semibold">{getCartItem(selectedProduct).quantity}</span>
+                          <button onClick={() => increaseQuantity(selectedProduct)} className="bg-green-500 text-white py-1 px-3 rounded">+</button>
+                          <button onClick={() => removeFromCart(selectedProduct)} className="text-[#ffd124] hover:text-[#edbd07] py-1 px-3 rounded"><ImBin className='w-7 h-7'/></button>
+                        </div>
+                      ) : (
+                        <button onClick={() => addToCart(selectedProduct)} className="bg-[#ffd124] hover:bg-[#edbd07] text-black font-semibold py-2 px-6 rounded-md mt-8">
+                          Add to Cart
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
+            )}
     </div>
   );
 };
