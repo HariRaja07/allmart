@@ -7,6 +7,7 @@ const backendUrl = "https://allmart-ecom-server.onrender.com"; // Replace with y
 
 const WishlistPage = ({ cartItems, setCartItems }) => {
   const [wishlistItems, setWishlistItems] = useState([]); // Store the items in the user's wishlist
+  const [isLoading, setIsLoading] = useState(true); // Track loading state
   const [isUpdatingWishlist, setIsUpdatingWishlist] = useState(false); // Track the state of wishlist updating
   const [removeMessage, setRemoveMessage] = useState(""); // State to hold the removal success message
   const [removedItemId, setRemovedItemId] = useState(null); // Track the ID of the removed item
@@ -28,6 +29,8 @@ const WishlistPage = ({ cartItems, setCartItems }) => {
       setWishlistItems(response.data.data); // Set wishlist items
     } catch (error) {
       console.error("Error fetching wishlist:", error);
+    } finally {
+      setIsLoading(false); // Set loading to false once the data is fetched
     }
   };
 
@@ -119,10 +122,29 @@ const WishlistPage = ({ cartItems, setCartItems }) => {
   };
 
   return (
-    <div className="flex flex-col container mx-auto mt-20 min-h-screen">
+    <div className="flex flex-col container mx-auto mt-40 min-h-screen">
       <h1 className="text-4xl font-bold mb-8">Your Wishlist</h1>
 
-      {wishlistItems.length === 0 ? (
+      {/* Show loading spinner while fetching wishlist */}
+      {isLoading ? (
+        <div className="flex justify-center items-center">
+          <svg
+            className="w-12 h-12 text-[#0f5286] animate-spin"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.3" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4 12a8 8 0 1 0 16 0 8 8 0 0 0-16 0z"
+            />
+          </svg>
+        </div>
+      ) : wishlistItems.length === 0 ? (
         <p className="text-xl font-semibold">Your wishlist is empty.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -137,10 +159,8 @@ const WishlistPage = ({ cartItems, setCartItems }) => {
                   className="flex flex-col space-y-2 bg-transparent bg-opacity-80 h-full flex justify-center items-center"
                   style={{ zIndex: 10 }}
                 >
-                    <MdBookmarkRemove className="h-8 w-auto text-green-500"/>
-                  <p className="text-xl font-semibold text-green-600">
-                    {removeMessage}
-                  </p>
+                  <MdBookmarkRemove className="h-8 w-auto text-green-500" />
+                  <p className="text-xl font-semibold text-green-600">{removeMessage}</p>
                 </div>
               ) : (
                 <>
@@ -164,37 +184,37 @@ const WishlistPage = ({ cartItems, setCartItems }) => {
 
                   {/* Add to Cart button */}
                   {getCartItem(item.productId) ? (
-                                      <div className="flex items-center space-x-2 mt-8">
-                                        <button
-                                          onClick={() => decreaseQuantity(item.productId)}
-                                          className="bg-red-500 text-white py-1 px-3 rounded"
-                                        >
-                                          -
-                                        </button>
-                                        <span className="text-lg font-semibold">
-                                          {getCartItem(item.productId).quantity}
-                                        </span>
-                                        <button
-                                          onClick={() => increaseQuantity(item.productId)}
-                                          className="bg-green-500 text-white py-1 px-3 rounded"
-                                        >
-                                          +
-                                        </button>
-                                        <button
-                                          onClick={() => removeFromCart(item.productId)}
-                                          className="text-[#ffd124] hover:text-[#edbd07] py-1 px-3 rounded"
-                                        >
-                                          <ImBin className="w-7 h-7" />
-                                        </button>
-                                      </div>
-                                    ) : (
-                                      <button
-                                        onClick={() => addToCart(item.productId)}
-                                        className="bg-[#ffd124] font-semibold hover:bg-[#edbd07] py-2 px-4 shadow-md rounded mt-8"
-                                      >
-                                        Add to Cart
-                                      </button>
-                                    )}
+                    <div className="flex items-center space-x-2 mt-8">
+                      <button
+                        onClick={() => decreaseQuantity(item.productId)}
+                        className="bg-red-500 text-white py-1 px-3 rounded"
+                      >
+                        -
+                      </button>
+                      <span className="text-lg font-semibold">
+                        {getCartItem(item.productId).quantity}
+                      </span>
+                      <button
+                        onClick={() => increaseQuantity(item.productId)}
+                        className="bg-green-500 text-white py-1 px-3 rounded"
+                      >
+                        +
+                      </button>
+                      <button
+                        onClick={() => removeFromCart(item.productId)}
+                        className="text-[#ffd124] hover:text-[#edbd07] py-1 px-3 rounded"
+                      >
+                        <ImBin className="w-7 h-7" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => addToCart(item.productId)}
+                      className="bg-[#ffd124] font-semibold hover:bg-[#edbd07] py-2 px-4 shadow-md rounded mt-8"
+                    >
+                      Add to Cart
+                    </button>
+                  )}
                 </>
               )}
             </div>
