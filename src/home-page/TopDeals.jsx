@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { ImBin } from "react-icons/im";
 import axios from "axios";
+import Wishlist from "../wishlist";
 
 const backendUrl = "https://allmart-ecom-server.onrender.com"; // Replace with your actual backend URL
 
@@ -11,13 +12,21 @@ const TopDeals = ({ cartItems, setCartItems }) => {
   const [loading, setLoading] = useState(true); // Loading state for API call
   const [error, setError] = useState(null); // Error state
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [wishlist, setWishlist] = useState([]); // Track user's wishlist items
+  const [isUpdatingWishlist, setIsUpdatingWishlist] = useState(false); // Track wishlist update status
+
+    const getToken = () => localStorage.getItem("token");
+  //console.log(localStorage.getItem('token'));  // Check if token is set
+
 
   useEffect(() => {
     const fetchDeals = async () => {
       try {
         setLoading(true); // Set loading state before fetching data
         const response = await axios.get(`${backendUrl}/api/v1/deal`);
-        setActiveDeals(response.data.data.activeDeals.slice(0, 4)); // Set the product list based on category
+        const dealsData = response.data.data.activeDeals.slice(0, 4);
+        //console.log(dealsData);
+        setActiveDeals(dealsData); // Set the product list based on category
         setLoading(false); // Set loading to false once data is fetched
       } catch (error) {
         console.error("Error fetching offers:", error);
@@ -28,6 +37,34 @@ const TopDeals = ({ cartItems, setCartItems }) => {
 
     fetchDeals();
   }, []); // This effect runs once on component mount
+
+  const fetchWishlist = async () => {
+    const token = getToken();
+
+    if (!token) return; // If no token, skip fetching wishlist
+
+    try {
+      const response = await axios.get(
+        `${backendUrl}/api/v1/users/wishlist`,
+        {
+          headers: {
+            "x-auth-token": token, // Include JWT token in headers
+          },
+        }
+      );
+      // Map wishlist to product IDs
+      const pId = response.data.data.map((item) => item.productId._id);
+      setWishlist(pId);
+      console.log(pId);
+    } catch (error) {
+      console.error("Error fetching wishlist:", error);
+    }
+  };
+  // Fetch user's wishlist on page load
+  useEffect(() => {
+    fetchWishlist();
+  }, []); // This will run only once when the component is first mounted
+  // Only fetch wishlist once, when the component is first rendered
 
   // Function to handle adding an item to the cart
   const addToCart = (item) => {
@@ -116,6 +153,7 @@ const TopDeals = ({ cartItems, setCartItems }) => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {activeDeals.length > 0 ? (
               activeDeals.map((item) => {
+                //console.log(item.product._id);
                 const cartItem = getCartItem(item.product); // Check if the item is in the cart
                 const discountedPrice =
                   item.product?.sellingprice -
@@ -153,6 +191,12 @@ const TopDeals = ({ cartItems, setCartItems }) => {
                         ${item.product?.sellingprice.toFixed(2)}
                       </p>
                     </div>
+                    <Wishlist 
+                    item={item.product}
+                    wishlist={wishlist}
+                    setWishlist={setWishlist}
+                    isUpdatingWishlist={isUpdatingWishlist}
+                    />
                     {cartItem ? (
                       <div className="flex items-center space-x-2 mt-8 border">
                         <button

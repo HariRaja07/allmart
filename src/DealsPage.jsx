@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios"; // To make API calls
 import { ImBin } from "react-icons/im";
+import Wishlist from "./wishlist";
 
 const backendUrl = "https://allmart-ecom-server.onrender.com"; // Replace with your actual backend URL
 
@@ -10,6 +11,11 @@ const DealsPage = ({ cartItems, setCartItems }) => {
   const [activeDeals, setActiveDeals] = useState([]); // Store the items for the current category
   const [loading, setLoading] = useState(true); // Loading state to handle the request
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [wishlist, setWishlist] = useState([]); // Track user's wishlist items
+  const [isUpdatingWishlist, setIsUpdatingWishlist] = useState(false); // Track wishlist update status
+
+  const getToken = () => localStorage.getItem("token");
+  //console.log(localStorage.getItem('token'));  // Check if token is set
 
   useEffect(() => {
     window.scrollTo(0, 0); // Scroll to top of the page
@@ -30,6 +36,34 @@ const DealsPage = ({ cartItems, setCartItems }) => {
 
     fetchDeals();
   }, []); // This effect runs when the 'name' parameter (category) changes
+
+  const fetchWishlist = async () => {
+    const token = getToken();
+
+    if (!token) return; // If no token, skip fetching wishlist
+
+    try {
+      const response = await axios.get(
+        `${backendUrl}/api/v1/users/wishlist`,
+        {
+          headers: {
+            "x-auth-token": token, // Include JWT token in headers
+          },
+        }
+      );
+      // Map wishlist to product IDs
+      const pId = response.data.data.map((item) => item.productId._id);
+      setWishlist(pId);
+      console.log(pId);
+    } catch (error) {
+      console.error("Error fetching wishlist:", error);
+    }
+  };
+  // Fetch user's wishlist on page load
+  useEffect(() => {
+    fetchWishlist();
+  }, []); // This will run only once when the component is first mounted
+  // Only fetch wishlist once, when the component is first rendered
 
   // Function to handle adding an item to the cart
   const addToCart = (item) => {
@@ -118,7 +152,7 @@ const DealsPage = ({ cartItems, setCartItems }) => {
               return (
                 <div
                   key={item._id}
-                  className="border w-3/4 p-4 rounded-md shadow-lg bg-white"
+                  className="border w-3/4 p-4 rounded-md shadow-lg bg-white relative"
                   onClick={(e) => {
                     // Prevent modal from opening when clicking on the "Add to Cart" button
                     if (e.target.closest("button")) return;
@@ -144,6 +178,12 @@ const DealsPage = ({ cartItems, setCartItems }) => {
                       ${item.product?.sellingprice.toFixed(2)}
                     </p>
                   </div>
+                  <Wishlist 
+                    item={item.product}
+                    wishlist={wishlist}
+                    setWishlist={setWishlist}
+                    isUpdatingWishlist={isUpdatingWishlist}
+                    />
                   {/* Display the Add to Cart button or the quantity controls */}
                   {cartItem ? (
                     <div className="flex items-center space-x-2 mt-8 border">

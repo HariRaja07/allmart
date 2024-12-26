@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ImBin } from "react-icons/im";
 import axios from 'axios';
+import Wishlist from "../wishlist";
 
 const backendUrl = "https://allmart-ecom-server.onrender.com"; // Replace with your actual backend URL
 
@@ -11,6 +12,11 @@ const OffersZone = ({ cartItems, setCartItems }) => {
   const [loading, setLoading] = useState(true); // Loading state for API call
   const [error, setError] = useState(null); // Error state
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [wishlist, setWishlist] = useState([]); // Track user's wishlist items
+  const [isUpdatingWishlist, setIsUpdatingWishlist] = useState(false); // Track wishlist update status
+
+  const getToken = () => localStorage.getItem("token");
+  //console.log(localStorage.getItem('token'));  // Check if token is set
 
   useEffect(() => {
     const fetchoffers = async () => {
@@ -28,6 +34,34 @@ const OffersZone = ({ cartItems, setCartItems }) => {
 
     fetchoffers();
   }, []);  // This effect runs once on component mount
+
+  const fetchWishlist = async () => {
+    const token = getToken();
+
+    if (!token) return; // If no token, skip fetching wishlist
+
+    try {
+      const response = await axios.get(
+        `${backendUrl}/api/v1/users/wishlist`,
+        {
+          headers: {
+            "x-auth-token": token, // Include JWT token in headers
+          },
+        }
+      );
+      // Map wishlist to product IDs
+      const pId = response.data.data.map((item) => item.productId._id);
+      setWishlist(pId);
+      console.log(pId);
+    } catch (error) {
+      console.error("Error fetching wishlist:", error);
+    }
+  };
+  // Fetch user's wishlist on page load
+  useEffect(() => {
+    fetchWishlist();
+  }, []); // This will run only once when the component is first mounted
+  // Only fetch wishlist once, when the component is first rendered
 
   // Function to handle adding an item to the cart
   const addToCart = (item) => {
@@ -125,6 +159,12 @@ const OffersZone = ({ cartItems, setCartItems }) => {
                       <p className="text-xl font-semibold text-red-600">${formattedDiscountedPrice}</p>
                       <p className="text-base line-through mr-4">${item.product?.sellingprice.toFixed(2)}</p>
                     </div>
+                    <Wishlist 
+                    item={item.product}
+                    wishlist={wishlist}
+                    setWishlist={setWishlist}
+                    isUpdatingWishlist={isUpdatingWishlist}
+                    />
                     {cartItem ? (
                     <div className="flex items-center space-x-2 mt-8 border">
                       <button onClick={() => decreaseQuantity(item.product)} className="bg-red-500 text-white py-1 px-3 rounded">-</button>
